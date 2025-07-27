@@ -10,7 +10,7 @@ const app = express()
 app.use(express.json())
 app.use(cors())
 connectDataBase()
-
+app.get("/", (req, res) => { res.send("hello") })
 app.use('/api/v1/', route)
 
 app.listen(3000, () => {
