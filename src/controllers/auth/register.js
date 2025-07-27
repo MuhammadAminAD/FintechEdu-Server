@@ -113,6 +113,14 @@ class RegisterController {
             }
 
             try {
+                  const existingUser = await User.findOne({ email });
+                  if (existingUser) {
+                        return res.status(409).send({
+                              ok: false,
+                              errors: { email: "Bu email bilan foydalanuvchi allaqachon mavjud" }
+                        });
+                  }
+
                   const hashedPassword = await bcrypt.hash(password, 10);
 
                   const newUser = new User({
@@ -125,25 +133,26 @@ class RegisterController {
 
                   await newUser.save();
 
-                  const token = {
-                        accessToken: generateAccessToken({ email, id: newUser._id }),
-                  }
-                  const refreshToken = generateRefreshToken({ email, id: newUser._id })
+                  const accessToken = generateAccessToken({ email, id: newUser._id });
+                  const refreshToken = generateRefreshToken({ email, id: newUser._id });
 
                   res.cookie("refreshToken", refreshToken, {
                         httpOnly: true,
                         secure: true,
                         sameSite: "Strict",
-                        maxAge: 30 * 24 * 60 * 60 * 1000,
+                        maxAge: 30 * 24 * 60 * 60 * 1000, 
                   });
 
                   return res.status(201).send({
                         ok: true,
                         message: "Ro‘yxatdan o‘tish muvaffaqiyatli yakunlandi",
-                        data: { email, token: token }
+                        data: {
+                              email,
+                              token: { accessToken }
+                        }
                   });
             } catch (error) {
-                  console.error("Step4 xatolik:", error);
+                  console.error("create() xatolik:", error);
                   return res.status(500).send({
                         ok: false,
                         error_message: "Serverda xatolik yuz berdi",
@@ -151,6 +160,7 @@ class RegisterController {
                   });
             }
       }
+
 }
 
 export default new RegisterController();
