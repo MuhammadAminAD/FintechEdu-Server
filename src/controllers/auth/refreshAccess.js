@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { generateAccessToken } from "../../utils/token.js";
+import { generateAccessToken } from "../../utils/GenerateToken.js";
 
 export const refreshAccessToken = (req, res) => {
       const refreshToken = req.cookies?.refreshToken;
@@ -18,8 +18,6 @@ export const refreshAccessToken = (req, res) => {
                   id: decoded.id,
                   email: decoded.email
             });
-
-            
 
             return res.status(200).json({
                   ok: true,
