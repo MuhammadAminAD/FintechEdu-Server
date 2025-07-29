@@ -88,18 +88,18 @@ class ResetPasswordController {
       }
 
       async complete(req, res) {
-            const { email, newPassword } = req.body;
+            const { email, password } = req.body;
 
             const errors = {};
             if (!email) errors.email = "Email manzili kerak";
-            if (!newPassword) errors.newPassword = "Yangi parol kerak";
+            if (!password) errors.password = "Yangi parol kerak";
 
             if (Object.keys(errors).length > 0) {
                   return res.status(400).send({ ok: false, errors });
             }
 
             try {
-                  const hashedPassword = await bcrypt.hash(newPassword, 10);
+                  const hashedPassword = await bcrypt.hash(password, 10);
                   const user = await User.updateOne({ email }, { password: hashedPassword }, { new: true });
 
 
