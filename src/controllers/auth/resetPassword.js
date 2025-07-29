@@ -41,7 +41,7 @@ class ResetPasswordController {
                   return res.status(200).send({
                         ok: true,
                         message: "Tasdiqlash kodi emailga yuborildi",
-                        data: { email: email, token }
+                        data: { email: email }
                   });
             } catch (error) {
                   return res.status(500).send({
