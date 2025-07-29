@@ -118,7 +118,7 @@ class ResetPasswordController {
                   return res.status(200).send({
                         ok: true,
                         message: "Parol muvaffaqiyatli yangilandi",
-                        data: { token: { accessToken } }
+                        data: { token: token }
                   });
             } catch (error) {
                   return res.status(500).send({
