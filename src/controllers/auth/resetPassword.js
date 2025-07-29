@@ -3,6 +3,7 @@ import AuthCode from "../../models/AuthCode.js";
 import { sendEmail } from "../../services/Mail.service.js";
 import generateCode from "../../utils/GenerateCode.js";
 import bcrypt from "bcrypt";
+import { generateAccessToken, generateRefreshToken } from "../../utils/GenerateToken.js";
 
 class ResetPasswordController {
       async request(req, res) {
@@ -36,17 +37,6 @@ class ResetPasswordController {
 
                   await AuthCode.deleteMany({ email: email });
                   await new AuthCode({ email: email, code: code }).save();
-                  const token = {
-                        accessToken: generateAccessToken({ email, id: user._id }),
-                  }
-                  const refreshToken = generateRefreshToken({ email, id: user._id })
-
-                  res.cookie("refreshToken", refreshToken, {
-                        httpOnly: true,
-                        secure: true,
-                        sameSite: "Strict",
-                        maxAge: 30 * 24 * 60 * 60 * 1000,
-                  });
 
                   return res.status(200).send({
                         ok: true,
@@ -110,12 +100,25 @@ class ResetPasswordController {
 
             try {
                   const hashedPassword = await bcrypt.hash(newPassword, 10);
-                  await User.updateOne({ email }, { password: hashedPassword });
+                  const user = await User.updateOne({ email }, { password: hashedPassword }, { new: true });
 
+
+                  const token = {
+                        accessToken: generateAccessToken({ email, id: user._id }),
+                  }
+                  const refreshToken = generateRefreshToken({ email, id: user._id })
+
+                  res.cookie("refreshToken", refreshToken, {
+                        httpOnly: true,
+                        secure: true,
+                        sameSite: "Strict",
+                        maxAge: 30 * 24 * 60 * 60 * 1000,
+                  });
 
                   return res.status(200).send({
                         ok: true,
-                        message: "Parol muvaffaqiyatli yangilandi"
+                        message: "Parol muvaffaqiyatli yangilandi",
+                        data: { token: { accessToken } }
                   });
             } catch (error) {
                   return res.status(500).send({
