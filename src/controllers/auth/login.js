@@ -30,9 +30,9 @@ async function login(req, res) {
                   });
             }
             const token = {
-                  accessToken: generateAccessToken({ email, id: newUser._id }),
+                  accessToken: generateAccessToken({ email, id: user._id }),
             }
-            const refreshToken = generateRefreshToken({ email, id: newUser._id })
+            const refreshToken = generateRefreshToken({ email, id: user._id })
 
             res.cookie("refreshToken", refreshToken, {
                   httpOnly: true,
