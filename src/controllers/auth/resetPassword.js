@@ -25,7 +25,7 @@ class ResetPasswordController {
                   }
 
                   const code = generateCode();
-                  const result = await sendEmail(email, code, type = "reset");
+                  const result = await sendEmail(email, code, "reset");
 
                   if (!result.ok) {
                         return res.status(500).send({
