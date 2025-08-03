@@ -86,7 +86,7 @@ class RegisterController {
                   return res.status(200).json({
                         ok: true,
                         message: "Kod muvaffaqiyatli tasdiqlandi",
-                        data: { email }
+                              
                   });
             } catch (error) {
                   console.error("Step3 xatolik:", error);

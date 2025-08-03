@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import { emailConfig } from "../configs/Mail.config.js";
+import { emailConfig } from "../configs/MailConfig.js";
 
 /**
  * @param {string} email - Qabul qiluvchi email manzil
