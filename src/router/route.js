@@ -5,6 +5,7 @@ import resetPassword from "../controllers/auth/resetPassword.js";
 import { refreshAccessToken } from "../controllers/auth/refreshAccess.js";
 import "../configs/google.js"
 import passport from "passport";
+import { authGoogle } from "../controllers/auth/GoogleAuth.js";
 
 const router = Router();
 // registration
@@ -32,7 +33,8 @@ router.get(
       passport.authenticate("google", {
             failureRedirect: "/",
             session: false,
-      })
+      }),
+      authGoogle
 );
 
 export default router;
