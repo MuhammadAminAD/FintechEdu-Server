@@ -6,6 +6,8 @@ import { refreshAccessToken } from "../controllers/auth/refreshAccess.js";
 import "../configs/google.js"
 import passport from "passport";
 import { authGoogle } from "../controllers/auth/GoogleAuth.js";
+import categories from "../controllers/Filters/index.js";
+import Filters from "../controllers/Filters/index.js";
 
 const router = Router();
 // registration
@@ -24,7 +26,7 @@ router.post("/auth/reset-password/verify-code", (req, res) => resetPassword.veri
 router.post("/auth/reset-password/chenge-password", (req, res) => resetPassword.complete(req, res));
 
 // token
-router.post("/auth/refresh", (req, res) => refreshAccessToken(req, res));
+router.get("/auth/refresh", (req, res) => refreshAccessToken(req, res));
 
 // google
 router.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
@@ -37,4 +39,7 @@ router.get(
       authGoogle
 );
 
+// Filters
+router.get("/filter/menus", (req, res) => Filters.Menus(req, res))
+router.get("/filetr/filter-menus", (req, res) => Filters.FilterMenus(req, res))
 export default router;

@@ -20,7 +20,7 @@ export const authGoogle = async (req, res) => {
                         sameSite: "Strict",
                         maxAge: 30 * 24 * 60 * 60 * 1000,
                   });
-                  res.redirect(`http://localhost:5173/googleAuth?token=${token}&email=${email}`);
+                  res.redirect(`${process.env.CLIENT_URL}/googleAuth?token=${accessToken}&email=${email}`);
             }
 
             else {
@@ -35,7 +35,7 @@ export const authGoogle = async (req, res) => {
                         sameSite: "Strict",
                         maxAge: 30 * 24 * 60 * 60 * 1000,
                   });
-                  res.redirect(`http://localhost:5173/googleAuth?token=${token}&email=${email}`);
+                  res.redirect(`${process.env.CLIENT_URL}/googleAuth?token=${accessToken}&email=${email}`);
             }
       } catch (error) {
             console.error("google auth xatolik:", error);
