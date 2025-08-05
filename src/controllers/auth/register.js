@@ -83,8 +83,8 @@ class RegisterController {
                   }
 
                   const verifyToken = generateAccessToken({ email })
-
                   await AuthCode.deleteOne({ email });
+
 
                   res.cookie("verifyToken", verifyToken, {
                         httpOnly: true,
@@ -118,7 +118,7 @@ class RegisterController {
             if (!email) errors.email = "Email manzili kerak";
             if (!password) errors.password = "Parol kiritilishi kerak";
             if (!gender) errors.gender = "Jins tanlanishi kerak";
-            if (!verifyToken) errors.email = "xafsizlik uchun malumotlar 5 daqiqa ichida kiritilishi kerak. Iltimos qayta urinib koring"
+            if (!verifyToken) errors.password = "xafsizlik uchun malumotlar 5 daqiqa ichida kiritilishi kerak. Iltimos qayta urinib koring"
 
             if (Object.keys(errors).length > 0) {
                   return res.status(400).send({ ok: false, errors });
