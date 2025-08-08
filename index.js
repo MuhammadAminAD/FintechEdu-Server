@@ -5,7 +5,7 @@ import route from "./src/router/route.js"
 import { connectDataBase } from "./src/configs/DataBase.js"
 
 dotenv.config()
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 5000
 const app = express()
 app.use(express.json())
 app.use(cors())
@@ -13,6 +13,6 @@ connectDataBase()
 app.get("/", (req, res) => { res.send("hello") })
 app.use('/api/v1/', route)
 
-app.listen(PORT, () => {
+app.listen(PORT ,'10.101.239.64', () => {
       console.log(`✅ Server running successfully\n📡 Listening on port: ${PORT}\n`);
 })
