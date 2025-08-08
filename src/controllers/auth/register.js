@@ -4,6 +4,7 @@ import { sendEmail } from "../../services/Mail.service.js";
 import generateCode from "../../utils/GenerateCode.js";
 import bcrypt from "bcrypt";
 import { generateAccessToken, generateRefreshToken } from "../../utils/GenerateToken.js";
+import jwt from 'jsonwebtoken';
 
 class RegisterController {
       async request(req, res) {
@@ -81,12 +82,21 @@ class RegisterController {
                         });
                   }
 
+                  const verifyToken = generateAccessToken({ email })
                   await AuthCode.deleteOne({ email });
+
+
+                  res.cookie("verifyToken", verifyToken, {
+                        httpOnly: true,
+                        secure: true,
+                        sameSite: "Strict",
+                        maxAge: 60 * 5000,
+                  });
 
                   return res.status(200).json({
                         ok: true,
                         message: "Kod muvaffaqiyatli tasdiqlandi",
-                              
+
                   });
             } catch (error) {
                   console.error("Step3 xatolik:", error);
@@ -99,6 +109,7 @@ class RegisterController {
       }
 
       async create(req, res) {
+            const verifyToken = req.cookies?.verifyToken
             const { firstName, lastName, email, password, gender } = req.body;
 
             const errors = {};
@@ -107,12 +118,23 @@ class RegisterController {
             if (!email) errors.email = "Email manzili kerak";
             if (!password) errors.password = "Parol kiritilishi kerak";
             if (!gender) errors.gender = "Jins tanlanishi kerak";
+            if (!verifyToken) errors.password = "xafsizlik uchun malumotlar 5 daqiqa ichida kiritilishi kerak. Iltimos qayta urinib koring"
 
             if (Object.keys(errors).length > 0) {
                   return res.status(400).send({ ok: false, errors });
             }
 
+
             try {
+                  const decoded = jwt.verify(verifyToken, process.env.JWT_SECRET);
+
+                  if (decoded.email !== email) {
+                        return res.status(403).send({
+                              ok: false,
+                              errors: { email: "Tasdiqlangan email bilan mos emas. Qayta ro‘yxatdan o‘ting." }
+                        });
+                  }
+
                   const existingUser = await User.findOne({ email });
                   if (existingUser) {
                         return res.status(409).send({
@@ -140,8 +162,9 @@ class RegisterController {
                         httpOnly: true,
                         secure: true,
                         sameSite: "Strict",
-                        maxAge: 30 * 24 * 60 * 60 * 1000, 
+                        maxAge: 30 * 24 * 60 * 60 * 1000,
                   });
+                  res.clearCookie("verifyToken");
 
                   return res.status(201).send({
                         ok: true,

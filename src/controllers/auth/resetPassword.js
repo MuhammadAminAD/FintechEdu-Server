@@ -4,6 +4,7 @@ import { sendEmail } from "../../services/Mail.service.js";
 import generateCode from "../../utils/GenerateCode.js";
 import bcrypt from "bcrypt";
 import { generateAccessToken, generateRefreshToken } from "../../utils/GenerateToken.js";
+import jwt from 'jsonwebtoken';
 
 class ResetPasswordController {
       async request(req, res) {
@@ -73,6 +74,13 @@ class ResetPasswordController {
                   }
 
                   await AuthCode.deleteMany({ email });
+                  const verifyToken = generateAccessToken({ email })
+                  res.cookie("verifyToken", verifyToken, {
+                        httpOnly: true,
+                        secure: true,
+                        sameSite: "Strict",
+                        maxAge: 60 * 5000,
+                  });
                   return res.status(200).send({
                         ok: true,
                         message: "Kod to‘g‘ri tasdiqlandi",
@@ -89,16 +97,28 @@ class ResetPasswordController {
 
       async complete(req, res) {
             const { email, password } = req.body;
+            const verifyToken = req.cookies?.verifyToken
 
             const errors = {};
             if (!email) errors.email = "Email manzili kerak";
             if (!password) errors.password = "Yangi parol kerak";
+            if (!verifyToken) errors.password = "xafsizlik uchun malumotlar 5 daqiqa ichida kiritilishi kerak. Iltimos qayta urinib koring"
+
 
             if (Object.keys(errors).length > 0) {
                   return res.status(400).send({ ok: false, errors });
             }
 
             try {
+                  const decoded = jwt.verify(verifyToken, process.env.JWT_SECRET);
+
+                  if (decoded.email !== email) {
+                        return res.status(403).send({
+                              ok: false,
+                              errors: { password: "Tasdiqlangan email bilan mos emas. Qayta ro‘yxatdan o‘ting." }
+                        });
+                  }
+
                   const hashedPassword = await bcrypt.hash(password, 10);
                   const user = await User.updateOne({ email }, { password: hashedPassword }, { new: true });
 

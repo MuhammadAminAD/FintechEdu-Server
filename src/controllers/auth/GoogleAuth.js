@@ -10,9 +10,8 @@ export const authGoogle = async (req, res) => {
             const isExist = await User.findOne({ email })
 
             if (isExist) {
-                  const token = {
-                        accessToken: generateAccessToken({ email, id: isExist._id }),
-                  }
+
+                  const accessToken = generateAccessToken({ email, id: isExist._id })
                   const refreshToken = generateRefreshToken({ email, id: isExist._id })
                   res.cookie("refreshToken", refreshToken, {
                         httpOnly: true,
