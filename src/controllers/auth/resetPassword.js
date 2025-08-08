@@ -120,8 +120,18 @@ class ResetPasswordController {
                   }
 
                   const hashedPassword = await bcrypt.hash(password, 10);
-                  const user = await User.updateOne({ email }, { password: hashedPassword }, { new: true });
+                  const user = await User.findOneAndUpdate(
+                        { email },
+                        { password: hashedPassword },
+                        { new: true }
+                  );
 
+                  if (!user) {
+                        return res.status(404).send({
+                              ok: false,
+                              errors: { password: "Foydalanuvchi topilmadi" }
+                        });
+                  }
 
                   const token = {
                         accessToken: generateAccessToken({ email, id: user._id }),
