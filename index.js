@@ -13,6 +13,6 @@ connectDataBase()
 app.get("/", (req, res) => { res.send("hello") })
 app.use('/api/v1/', route)
 
-app.listen(PORT ,'10.101.239.64', () => {
+app.listen(PORT ,PORT == 5000 && '10.101.239.64', () => {
       console.log(`✅ Server running successfully\n📡 Listening on port: ${PORT}\n`);
 })
