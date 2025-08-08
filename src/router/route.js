@@ -6,8 +6,11 @@ import { refreshAccessToken } from "../controllers/auth/refreshAccess.js";
 import "../configs/google.js"
 import passport from "passport";
 import { authGoogle } from "../controllers/auth/GoogleAuth.js";
-import categories from "../controllers/Filters/index.js";
-import Filters from "../controllers/Filters/index.js";
+import Filters from "../controllers/filters/index.js";
+import multer from "multer";
+import posts from "../controllers/post/index.js"
+import { VerifyUser } from "../middlewares/VerifyUser.js";
+const upload = multer({ dest: "uploads/" });
 
 const router = Router();
 // registration
@@ -16,7 +19,7 @@ router.post("/auth/registration/verify-code", (req, res) => Register.verify(req,
 router.post("/auth/registration/create-user", (req, res) => Register.create(req, res));
 
 
-// Login
+// login
 router.post("/auth/login", (req, res) => Login(req, res));
 
 
@@ -39,7 +42,14 @@ router.get(
       authGoogle
 );
 
-// Filters
+// filters
 router.get("/filter/menus", (req, res) => Filters.Menus(req, res))
-router.get("/filetr/filter-menus", (req, res) => Filters.FilterMenus(req, res))
+router.get("/filter/filter-menus", (req, res) => Filters.FilterMenus(req, res))
+
+// posts
+router.post("/posts", VerifyUser, upload.any(), async (req, res) => posts.createPost(req, res));
+router.get("/posts/:id", upload.any(), async (req, res) => posts.getById(req, res));
+router.get("/posts", upload.any(), async (req, res) => posts.getAll(req, res));
+
+
 export default router;
