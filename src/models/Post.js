@@ -31,7 +31,9 @@ const RatingSchema = new Schema({
     3: { type: Number, default: 0 },
     4: { type: Number, default: 0 },
     5: { type: Number, default: 0 },
+    rating: { type: Number }
 })
+
 
 const Post = new Schema({
     creatorId: { type: mongoose.Schema.Types.ObjectId, ref: "Users", required: true },
@@ -40,7 +42,7 @@ const Post = new Schema({
     language: { type: String, default: "Uzbek" },
     bio: { type: BioSchema },
     level: { type: String },
-    price: { type: String, default: 0 },
+    price: { type: Number, default: 0 },
     category: { type: String },
     subCategory: { type: String },
     cover: { type: String },

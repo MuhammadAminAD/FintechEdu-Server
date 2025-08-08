@@ -8,6 +8,7 @@ class PostsController {
         const files = req.files || [];
         const creatorId = req.user.id;
         let tempUploadedFiles = [];
+        console.log(files)
         try {
             if (typeof data.modules === "string") data.modules = JSON.parse(data.modules);
             if (typeof data.keywords === "string") data.keywords = JSON.parse(data.keywords);
@@ -35,7 +36,7 @@ class PostsController {
                 })
             );
 
-            const savedPost = new Post(data);
+            const savedPost = new Post({ ...data, price: data.price ? Number(data.price) : 0 });
             await savedPost.save();
 
             res.send({ ok: true });
@@ -70,14 +71,28 @@ class PostsController {
     }
 
     async getAll(req, res) {
+        console.log("salom")
         const {
             limit = 10,
             category = "",
             subCategory = "",
             search = "",
             language = "",
-            skip = 0
+            skip = 0,
+            rating, // 4.5-5
+            price,
         } = req.query;
+
+        let filterPrice = {}
+        let ratingFilter = {}
+        if (price) {
+            filterPrice = { price: price.toLowerCase() === "price increase" ? 1 : -1 }
+        }
+
+        if (rating) {
+            const [minRating, maxRating] = rating.split("-").map(Number);
+            ratingFilter = { "rating.rating": { $gte: minRating, $lte: maxRating } };
+        }
 
         try {
             const posts = await Post.find({
@@ -85,12 +100,15 @@ class PostsController {
                 subCategory: { $regex: subCategory, $options: "i" },
                 language: { $regex: language, $options: "i" },
                 $or: [
-                    { title: { $regex: search, $options: "i" } },
+                    { name: { $regex: search, $options: "i" } },
                     { keywords: { $in: [new RegExp(search, "i")] } }
-                ]
-            })
+                ],
+                ...ratingFilter
+
+            }, { language: 0, created_at: 0, level: 0, category: 0, subCategory: 0, keywords: 0, modules: 0 })
                 .skip(Number(skip))
-                .limit(Number(limit));
+                .limit(Number(limit))
+                .sort(filterPrice);
 
             res.status(200).json({ ok: true, data: posts });
         } catch (error) {

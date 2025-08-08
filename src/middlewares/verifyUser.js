@@ -3,8 +3,6 @@ import User from "../models/User.js";
 
 export const VerifyUser = async (req, res, next) => {
     const accessToken = req.headers.authorization?.split(" ")[1];
-    console.log(accessToken)
-    console.log(process.env.JWT_SECRET)
 
     if (!accessToken) {
         return res.status(401).json({ ok: false, error_message: "Token topilmadi" });
