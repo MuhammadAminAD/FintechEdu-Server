@@ -1,26 +1,28 @@
 import Post from "../../models/Post.js";
+import { getPostOwner } from "../../utils/getPostOwner.js";
 import { sendVedio } from "../../utils/SendVedioToChannel.js";
 import fs from "fs/promises";
 
 class PostsController {
     async createPost(req, res) {
         const data = req.body;
-        const files = req.files || [];
+        const files = req.files;
         const creatorId = req.user.id;
         let tempUploadedFiles = [];
-        console.log(files)
+
         try {
             if (typeof data.modules === "string") data.modules = JSON.parse(data.modules);
             if (typeof data.keywords === "string") data.keywords = JSON.parse(data.keywords);
 
-            data.creatorId = creatorId;
+            data.creator_id = creatorId;
 
             await Promise.all(
                 data.modules.map(async (module) => {
                     await Promise.all(
                         module.videos.map(async (video) => {
-                            const file = files.find(f => f.fieldname === video.vedioName);
-                            if (!file) throw new Error(`File not found for video: ${video.vedioName}`);
+                            console.log(video.videoName)
+                            const file = files.find(f => f.fieldname === video.videoName);
+                            if (!file) throw new Error(`File not found for video: ${video.videoName}`);
 
                             const fileId = await sendVedio(file.filename);
                             video.id = fileId;
@@ -56,14 +58,16 @@ class PostsController {
     }
 
     async getById(req, res) {
+        const postId = req.params.id;
         try {
-            const postId = req.params.id;
             if (!postId) return res.status(400).json({ ok: false, error_message: "Post ID kiritilmadi" });
 
-            const post = await Post.findById(postId);
+            const post = await Post.findById(postId).lean();
+            const owner = await getPostOwner(post.creator_id, ["_id", "firstName", "lastName", 'photo'])
+            const fullData = { ...post, owner }
             if (!post) return res.status(404).json({ ok: false, error_message: "Post topilmadi" });
 
-            res.status(200).json({ ok: true, data: post });
+            res.status(200).json({ ok: true, data: fullData });
         } catch (error) {
             console.error("❌ getById xatolik:", error);
             res.status(500).json({ ok: false, error_message: "Server xatosi" });
@@ -79,7 +83,7 @@ class PostsController {
             search = "",
             language = "",
             skip = 0,
-            rating, // 4.5-5
+            rating,
             price,
         } = req.query;
 
@@ -108,9 +112,20 @@ class PostsController {
             }, { language: 0, created_at: 0, level: 0, category: 0, subCategory: 0, keywords: 0, modules: 0 })
                 .skip(Number(skip))
                 .limit(Number(limit))
-                .sort(filterPrice);
+                .sort(filterPrice)
+                .lean();
 
-            res.status(200).json({ ok: true, data: posts });
+            const fullData = await Promise.all(
+                posts.map(async (post) => {
+                    const { creator_id } = post
+                    const { firstName, lastName } = await getPostOwner(creator_id, ["firstName", "lastName"])
+                    return {
+                        ...post, owner: { firstName, lastName }
+                    }
+                })
+            )
+
+            res.status(200).json({ ok: true, data: fullData });
         } catch (error) {
             console.error(error);
             res.status(500).json({ ok: false, error: error.message });
@@ -133,40 +148,40 @@ export default new PostsController();
 //         category: 'It',
 //         subCategory: 'Frontend',
 //         keywords: '["frontend",  "dars" , "vedio"]',
-//         modules: [
+// modules: [
+//     {
+//         title: "1-modul",
+//         description: "Kirish",
+//         vedios: [
 //             {
-//                 title: "1-modul",
-//                 description: "Kirish",
-//                 vedios: [
-//                     {
-//                         title: "Ustoz bilan tanishuv",
-//                         bio: "Bu darsda biz ustoz bilan yaqidan tanishamiz.",
-//                         vedioName: "1-vedio",
-//                     },
-//                     {
-//                         title: "Dasturlas ozi nima",
-//                         bio: "Dasturlash asoslarini korib chiqish.",
-//                         vedioName: "2-vedio",
-//                     }
-//                 ]
+//                 title: "Ustoz bilan tanishuv",
+//                 bio: "Bu darsda biz ustoz bilan yaqidan tanishamiz.",
+//                 vedioName: "1-vedio",
 //             },
 //             {
-//                 title: "2-modul",
-//                 description: "HTML",
-//                 vedios: [
-//                     {
-//                         title: "div",
-//                         bio: "Div ochish",
-//                         vedioName: "3-vedio",
-//                     },
-//                     {
-//                         title: "p , h1 ,h2.... ",
-//                         bio: "textlar bilan ishlash",
-//                         vedioName: "4-vedio",
-//                     }
-//                 ]
-//             },
+//                 title: "Dasturlas ozi nima",
+//                 bio: "Dasturlash asoslarini korib chiqish.",
+//                 vedioName: "2-vedio",
+//             }
 //         ]
+//     },
+//     {
+//         title: "2-modul",
+//         description: "HTML",
+//         vedios: [
+//             {
+//                 title: "div",
+//                 bio: "Div ochish",
+//                 vedioName: "3-vedio",
+//             },
+//             {
+//                 title: "p , h1 ,h2.... ",
+//                 bio: "textlar bilan ishlash",
+//                 vedioName: "4-vedio",
+//             }
+//         ]
+//     },
+// ]
 //     },
 //     files: [
 //         {

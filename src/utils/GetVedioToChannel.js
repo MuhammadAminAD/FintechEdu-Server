@@ -7,7 +7,7 @@ export async function downloadTelegramVideo(fileId, saveFileName) {
         const fileInfo = await axios.get(`https://api.telegram.org/bot${process.env.TG_BOT_TOKEN}/getFile?file_id=${fileId}`);
         const filePath = fileInfo.data.result.file_path;
 
-        const fileUrl = `https://api.telegram.org/file/bot${botToken}/${filePath}`;
+        const fileUrl = `https://api.telegram.org/file/bot${process.env.TG_BOT_TOKEN}/${filePath}`;
         const savePath = path.join('./downloads', saveFileName);
 
         if (!fs.existsSync('./src/downloads')) {

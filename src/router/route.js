@@ -10,6 +10,7 @@ import Filters from "../controllers/filters/index.js";
 import multer from "multer";
 import posts from "../controllers/post/index.js"
 import { VerifyUser } from "../middlewares/VerifyUser.js";
+import VideoController from "../controllers/video/index.js"
 const upload = multer({ dest: "uploads/" });
 
 const router = Router();
@@ -51,5 +52,8 @@ router.post("/posts", VerifyUser, upload.any(), async (req, res) => posts.create
 router.get("/posts/:id", upload.any(), async (req, res) => posts.getById(req, res));
 router.get("/posts", upload.any(), async (req, res) => posts.getAll(req, res));
 
+
+// video
+router.get("/video/:id/:video", (req, res) => VideoController.get(req, res))
 
 export default router;

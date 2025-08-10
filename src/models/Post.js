@@ -36,7 +36,7 @@ const RatingSchema = new Schema({
 
 
 const Post = new Schema({
-    creatorId: { type: mongoose.Schema.Types.ObjectId, ref: "Users", required: true },
+    creator_id: { type: mongoose.Schema.Types.ObjectId, ref: "Users", required: true },
     created_at: { type: Date, default: Date.now },
     name: { type: String, required: true },
     language: { type: String, default: "Uzbek" },
@@ -48,7 +48,8 @@ const Post = new Schema({
     cover: { type: String },
     keywords: { type: [String], default: [] },
     modules: { type: [ModuleSchema], default: [] },
-    rating: { type: RatingSchema }
+    rating: { type: RatingSchema },
+    number_sales: { type: Number, default: 0 }
 });
 
 const PostModel = mongoose.models.Post || mongoose.model("Post", Post);
