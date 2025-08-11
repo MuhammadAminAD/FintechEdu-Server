@@ -6,7 +6,7 @@ import { refreshAccessToken } from "../controllers/auth/refreshAccess.js";
 import "../configs/google.js"
 import passport from "passport";
 import { authGoogle } from "../controllers/auth/GoogleAuth.js";
-import Filters from "../controllers/filters/index.js";
+import Filters from "../controllers/Filters/index.js";
 import multer from "multer";
 import posts from "../controllers/post/index.js"
 import { VerifyUser } from "../middlewares/VerifyUser.js";
