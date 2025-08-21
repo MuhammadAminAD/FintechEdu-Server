@@ -11,7 +11,8 @@ const UserSchema = new Schema({
       email: { type: String, required: true, unique: true },
       password: { type: String, required: true, },
       gender: { type: String, enum: ['Male', 'Female', "no selected"], default: "no selected" },
-      photo: { type: String, default: defaultImageBuffer }
+      photo: { type: String, default: defaultImageBuffer },
+      bio: { type: String, default: "" }
 });
 
 export default mongoose.models['Users'] || mongoose.model('Users', UserSchema);

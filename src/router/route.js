@@ -54,6 +54,10 @@ router.get("/posts", upload.any(), async (req, res) => posts.getAll(req, res));
 
 
 // video
-router.get("/video/:id/:video", (req, res) => VideoController.get(req, res))
+router.get("/video/:id", (req, res) => VideoController.get(req, res))
+
+
+// user
+router.get(`/user/:id` , (req , res) => )
 
 export default router;
