@@ -12,7 +12,7 @@ import { VerifyUser } from "../middlewares/verifyUser.js"
 import VideoController from "../controllers/video/index.js"
 const upload = multer({ dest: "uploads/" });
 import Filters from "../controllers/filter/index.js"
-
+import Profile from "../controllers/user/index.js"
 const router = Router();
 // registration
 router.post("/auth/registration/request-code", (req, res) => Register.request(req, res));
@@ -58,6 +58,8 @@ router.get("/video/:id", (req, res) => VideoController.get(req, res))
 
 
 // user
-router.get(`/user/:id` , (req , res) => )
+router.get(`/user/:id`, (req, res) => Profile.profile(req, res))
+router.get(`/user`, VerifyUser, (req, res) => Profile.profile(req, res))
+router.patch(`/user`, VerifyUser, upload.single("photo"), (req, res) => Profile.update(req, res))
 
 export default router;

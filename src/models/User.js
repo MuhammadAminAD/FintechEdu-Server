@@ -12,7 +12,11 @@ const UserSchema = new Schema({
       password: { type: String, required: true, },
       gender: { type: String, enum: ['Male', 'Female', "no selected"], default: "no selected" },
       photo: { type: String, default: defaultImageBuffer },
-      bio: { type: String, default: "" }
+      bio: { type: String, default: "" },
+      state: { type: String },
+      city: { type: String },
+      date_birthday: { type: String },
+      interest: { type: String }
 });
 
 export default mongoose.models['Users'] || mongoose.model('Users', UserSchema);
